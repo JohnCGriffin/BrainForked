@@ -10,3 +10,6 @@ Step 1 - The Makefile is set to use **clang++**.  Change to **g++** if you prefe
 
 Step 2 - On a Unix machine, use ```make```.  
 
+Step 3 - ```make test`` to try it on the included mandelbrot.bf, 
+        a common exercise in BF land.
+

@@ -10,6 +10,7 @@ namespace bf {
 #define ACTIONOUT(A) case A: return os << #A
 	switch(action){
 	    ACTIONOUT(ADD);
+	    ACTIONOUT(ADVANCE);
 	    ACTIONOUT(FALSEJUMP);
 	    ACTIONOUT(INCR);
 	    ACTIONOUT(M1);
@@ -21,11 +22,10 @@ namespace bf {
 	    ACTIONOUT(READ);
 	    ACTIONOUT(TERMINATE);
 	    ACTIONOUT(TRUEJUMP);
+	    ACTIONOUT(VALUE);
 	    ACTIONOUT(WHILEIM2);
 	    ACTIONOUT(WHILEIM3);
 	    ACTIONOUT(ZERO);
-	    ACTIONOUT(ADVANCE);
-	    ACTIONOUT(VALUE);
 	default:
 	    throw std::logic_error(__FILE__ " unhandled Action case in operator<<");
 	}

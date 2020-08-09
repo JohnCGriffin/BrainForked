@@ -12,5 +12,9 @@ OBJS = bf_main.o bf_instruction.o bf_io.o bf_optimizations.o
 bf: $(OBJS)
 	$(CXX) $(CXXFLAGS) $(OBJS) -o $@
 
+test: bf
+	./bf < /dev/null && time ./bf mandelbrot.bf
+	
+
 clean:
 	rm -rf a.out* bf *.o *.out 
