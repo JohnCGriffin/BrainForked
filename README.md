@@ -6,6 +6,7 @@ BF programs.
 
 ## Building
 
-Step 1 - On a Unix machine, use ```make```.  
+Step 1 - The Makefile is set to use *clang++*.  Change to *g++* is you prefer.
 
-Step 2 - There is no step two.  You already typed ```make```.
+Step 2 - On a Unix machine, use ```make```.  
+

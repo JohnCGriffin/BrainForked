@@ -8,7 +8,7 @@
 #include <map>
 #include <cstring>
 
-#include "bf_instruction.hpp"
+#include "bf.hpp"
 
 namespace bf {
 

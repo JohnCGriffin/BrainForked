@@ -1,6 +1,6 @@
 
 
-#include "bf_instruction.hpp"
+#include "bf.hpp"
 
 #include <map>
 
