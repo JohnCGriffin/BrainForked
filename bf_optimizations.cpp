@@ -8,15 +8,9 @@ namespace bf {
 
     static bool matches(const Instructions& instrs, int offset, Actions actions)
     {
-	if(offset >= ((int) instrs.size()) - ((int) actions.size())){
-	    return false;
-	}
+	const int sz = instrs.size();
 	for(auto a : actions){
-            // if val cannot fit in char, deny
-            if(((char) instrs.at(offset).val) != instrs.at(offset).val){
-                return false;
-            }
-	    if(a != instrs.at(offset++).action){
+	    if(offset >= sz || a != instrs.at(offset++).action){
 		return false;
 	    }
 	}
