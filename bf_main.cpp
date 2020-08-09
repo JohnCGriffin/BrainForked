@@ -86,7 +86,7 @@ namespace bf {
         // initial JUMP.  The remainder happen via the LOOP macro.
         goto *(IP->jump);
 
-#define LOOP() IP++; goto *(IP->jump)//*jumps[IP->action]
+#define LOOP() IP++; goto *(IP->jump)
 
     _TRUEJUMP:
         if(*ptr){
