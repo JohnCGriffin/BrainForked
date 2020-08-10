@@ -9,9 +9,9 @@ namespace bf {
     {
 #define ACTIONOUT(A) case A: return os << #A
 	switch(action){
-	    ACTIONOUT(ADD);
 	    ACTIONOUT(ADVANCE);
 	    ACTIONOUT(FALSEJUMP);
+	    ACTIONOUT(GIVE);
 	    ACTIONOUT(INCR);
 	    ACTIONOUT(M1);
 	    ACTIONOUT(MOVE);
@@ -20,6 +20,7 @@ namespace bf {
 	    ACTIONOUT(OFFINCR);
 	    ACTIONOUT(PRINT);
 	    ACTIONOUT(READ);
+	    ACTIONOUT(TAKE);
 	    ACTIONOUT(TERMINATE);
 	    ACTIONOUT(TRUEJUMP);
 	    ACTIONOUT(VALUE);

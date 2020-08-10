@@ -9,8 +9,8 @@
 
 namespace bf {
 
-#define ENUMERATED_ACTIONS { ADD, ADVANCE, FALSEJUMP, INCR, M1, MOVE, MOVEINCR, \
-			     MOVEWHILE, OFFINCR, PRINT, READ, TERMINATE, \
+#define ENUMERATED_ACTIONS { ADVANCE, FALSEJUMP, GIVE, INCR, M1, MOVE, MOVEINCR, \
+			     MOVEWHILE, OFFINCR, PRINT, READ, TAKE, TERMINATE, \
 			     TRUEJUMP, VALUE, WHILEIM2, WHILEIM3, ZERO }
 
     enum Action ENUMERATED_ACTIONS;
@@ -19,6 +19,9 @@ namespace bf {
 	Action action;
         short val;
 	void* jump;
+#ifdef PROFILER
+        int ndx;
+#endif
     };
 
     using Instructions = std::vector<Instruction>;

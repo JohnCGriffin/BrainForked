@@ -29,6 +29,21 @@ namespace bf {
 
 	    auto pattern  = [&](Actions actions){ return matches(instrs, i, actions); };
 
+	    // GIVE becomes TAKE if > GIVE <, i.e. 3 instructions -> 1
+            if(int sz = result.size();sz > 1){
+		auto prev1 = result.at(sz-1);
+		auto prev2 = result.at(sz-2);
+                if(AT(0).action == MOVE &&
+		   prev1.action == GIVE &&
+		   prev2.action == MOVE &&
+		   VAL(0) == prev1.val &&
+		   VAL(0) == -prev2.val){
+		    result.pop_back();
+		    result.pop_back();
+		    result.push_back({ TAKE, (short) -VAL(0) });
+                    continue;
+		}
+	    }
 
             // common pattern of move, transfer, move
             if(pattern({ FALSEJUMP, MOVE, FALSEJUMP, INCR, MOVE, INCR, MOVE, TRUEJUMP, MOVE, TRUEJUMP}) &&
@@ -44,7 +59,7 @@ namespace bf {
 	    // subtract value from current cell and add it to another cell
 	    if(pattern({ FALSEJUMP, INCR, MOVE, INCR, MOVE, TRUEJUMP }) &&
 	       VAL(1) == -1 && VAL(3) == 1 && VAL(2) == -VAL(4)){
-		result.push_back( { ADD, VAL(2) } );
+		result.push_back( { GIVE, VAL(2) } );
 		i += 5;
 		continue;
 	    }
@@ -52,7 +67,7 @@ namespace bf {
 	    // subtract value from current cell and add it to another cell
 	    if(pattern({ FALSEJUMP, MOVE, INCR, MOVE, INCR, TRUEJUMP }) &&
 	       VAL(2) == 1 && VAL(4) == -1 && VAL(1) == -VAL(3)){
-		result.push_back( { ADD, VAL(1) });
+		result.push_back( { GIVE, VAL(1) });
 		i += 5;
 		continue;
             }

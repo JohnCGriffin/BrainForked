@@ -10,15 +10,23 @@
 
 #include "bf.hpp"
 
-namespace bf {
+#ifdef PROFILER
+#include <thread>
+#endif
 
+
+#ifdef PROFILER
+    static volatile int current_loop;
+    static std::map<volatile int,unsigned long> counts;
+#endif
+
+namespace bf {
 
     static Instructions load_instructions(std::istream& is)
     {
         auto instructions = read_instructions(is);
 
         instructions = optimizations(instructions);
-
 
         // WHILE LOOP PATCHING MUST BE LAST
         // so that the mutual begin/end while
@@ -54,7 +62,8 @@ namespace bf {
         addrs[ADVANCE]     = &&_ADVANCE;
         addrs[VALUE]       = &&_VALUE;
         addrs[MOVE]        = &&_MOVE;
-        addrs[ADD]         = &&_ADD;
+        addrs[GIVE]        = &&_GIVE;
+        addrs[TAKE]        = &&_TAKE;
         addrs[INCR]        = &&_INCR;
         addrs[TRUEJUMP]    = &&_TRUEJUMP;
         addrs[FALSEJUMP]   = &&_FALSEJUMP;
@@ -79,9 +88,16 @@ namespace bf {
             instr.jump = addrs.at(instr.action);
         }
 
+#ifdef PROFILER
+        for(int i=0; i<_instructions.size(); i++){
+            _instructions.at(i).ndx = i;
+        }
+#endif
+
         std::vector<char> characters(30000);
         char* ptr = characters.data();
-        auto IP = _instructions.data();
+        auto BEGIN = _instructions.data();
+        auto IP = BEGIN;
 
         // initial JUMP.  The remainder happen via the LOOP macro.
         goto *(IP->jump);
@@ -98,6 +114,11 @@ namespace bf {
         if(!(*ptr)){
             IP += IP->val;
         }
+else {
+#ifdef PROFILER
+	    current_loop = IP->ndx;
+#endif
+}
         LOOP();
 
     _WHILEIM3:
@@ -165,9 +186,14 @@ namespace bf {
     _VALUE:
         LOOP();
 
-    _ADD:
+    _GIVE:
         ptr[IP->val] += (ptr[0] + 256);
         ptr[0] = 0;
+	LOOP();
+
+    _TAKE:
+        ptr[0] += (ptr[IP->val] + 256);
+        ptr[IP->val] = 0;
 	LOOP();
 
     _MOVE:
@@ -189,8 +215,10 @@ namespace bf {
         LOOP();
 
 
-    _PRINT:         
+    _PRINT:
+#ifndef PROFILER
         std::cout << (*ptr);
+#endif
         LOOP();
 
     _READ:
@@ -206,6 +234,11 @@ namespace bf {
 
 int main(int argc, char** argv)
 {
+    bool dump = argc > 1 && !strcmp("-dump",argv[1]);
+    if(dump){
+        argc--;
+        argv++;
+    }
     std::ifstream ifs;
 
     if(argc == 2){
@@ -220,7 +253,55 @@ int main(int argc, char** argv)
     
     auto instrs = bf::load_instructions(is);
 
+    if(dump){
+        auto while_level = 0;
+        for(int i=0; i<instrs.size(); i++){
+	    auto instr = instrs[i];
+            if(instr.action == bf::TRUEJUMP){
+		while_level--;
+	    }
+            std::cout.width(6);
+            std::cout << i << " ";
+	    for(int j=0; j<while_level; j++){
+		std::cout << "  ";
+	    }
+	    std::cout << instr.action << " " << instr.val << "\n";
+	    if(instr.action == bf::FALSEJUMP){
+		while_level++;
+	    }
+        }
+	return 0;
+    }
+
+#ifdef PROFILER
+
+    std::thread profiler([&]{
+                            while(!current_loop) ;
+                            while(current_loop){
+				auto count = counts[current_loop];
+				if(count > 100000){
+				    break;
+				}
+				counts[current_loop]++;
+                                std::this_thread::yield();
+                                std::cout << std::flush;
+			    }
+			 });
+
     bf::execute(instrs);
+    current_loop = 0;
+
+    profiler.join();
+
+    for(auto entry : counts){
+	std::cout << entry.second << " " << entry.first 
+            << " " << instrs.at(entry.first).val + entry.first << "\n";
+    }
+#else
+
+    bf::execute(instrs);
+
+#endif
 
     return 0;
 }
