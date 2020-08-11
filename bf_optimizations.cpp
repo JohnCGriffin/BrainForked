@@ -104,6 +104,30 @@ namespace bf {
 		continue;
 	    }
 
+            if(pattern({ INCR, MOVE}) && VAL(0) == -1){
+                result.push_back({ DECR1MX, VAL(1) });
+                i++;
+                continue;
+            }
+
+            if(pattern({ INCR, MOVE}) && VAL(0) == 1){
+                result.push_back({ INCR1MX, VAL(1) });
+                i++;
+                continue;
+            }
+
+            if(pattern({ MOVE, INCR }) && VAL(1) == 1){
+                result.push_back({ MXINCR1, VAL(0) });
+                i++;
+                continue;
+            }
+
+            if(pattern({ MOVE, INCR }) && VAL(1) == -1){
+                result.push_back({ MXDECR1, VAL(0) });
+                i++;
+                continue;
+            }
+
 	    // registers an itsy-bitsy improvement.
 	    if(pattern({ MOVE, INCR})) {
 		result.push_back ({VALUE, VAL(0)});

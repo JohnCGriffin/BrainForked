@@ -65,6 +65,10 @@ namespace bf {
         addrs[GIVE]        = &&_GIVE;
         addrs[TAKE]        = &&_TAKE;
         addrs[INCR]        = &&_INCR;
+        addrs[INCR1MX]        = &&_INCR1MX;
+        addrs[DECR1MX]        = &&_DECR1MX;
+        addrs[MXINCR1]        = &&_MXINCR1;
+        addrs[MXDECR1]        = &&_MXDECR1;
         addrs[TRUEJUMP]    = &&_TRUEJUMP;
         addrs[FALSEJUMP]   = &&_FALSEJUMP;
         addrs[ZERO]        = &&_ZERO;
@@ -119,6 +123,26 @@ else {
 	    current_loop = IP->ndx;
 #endif
 }
+        LOOP();
+
+    _DECR1MX:
+        ptr[0]--;
+        ptr += IP->val;
+        LOOP();
+
+    _INCR1MX:
+        ptr[0]++;
+        ptr += IP->val;
+        LOOP();
+
+    _MXINCR1:
+        ptr += IP->val;
+        ptr[0]++;
+        LOOP();
+
+    _MXDECR1:
+        ptr += IP->val;
+        ptr[0]--;
         LOOP();
 
     _WHILEIM3:
