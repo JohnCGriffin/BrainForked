@@ -70,6 +70,12 @@ namespace bf {
 		continue;
 	    }
 
+
+            ///////////////////////////////////////////////////
+            //  All that follow are primitives, thus pass #1.
+            //////////////////////////////////////////////////
+
+
 	    // subtract value from current cell and add it to another cell
 	    if(pattern({ FALSEJUMP, INCR, MOVE, INCR, MOVE, TRUEJUMP }) &&
 	       VAL(1) == -1 && VAL(3) == 1 && VAL(2) == -VAL(4)){
