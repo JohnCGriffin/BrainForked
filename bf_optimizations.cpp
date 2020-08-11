@@ -17,7 +17,8 @@ namespace bf {
 	return true;
     }
 
-    Instructions optimizations(const Instructions& instrs)
+    // Two passes allows for simple forward looking pattern matches 
+    Instructions optimizations(const Instructions& instrs, bool take_second_pass)
     {
 	Instructions result;
 	const int sz = instrs.size();
@@ -28,35 +29,37 @@ namespace bf {
 #define VAL(x) instrs.at(i+x).val
 
 	    auto pattern  = [&](Actions actions){ return matches(instrs, i, actions); };
+
+            if(pattern({ZERO, INCR, ZERO})){
+                result.push_back({ZERO});
+                i+=2;
+                continue;
+            }
 	    
-	    const int sz = result.size();
-
-
-            if(AT(0).action == MOVE && VAL(0) == 1 && sz > 0 && result.back().action == ZERO){
-                result.pop_back();
-                result.push_back({ ZEROM1});
+            if(pattern({ZERO, ZERO})){
+                result.push_back({ZERO});
+                i++;
+                continue;
+            }
+	    
+            if(pattern({ZERO, MOVE}) && VAL(1) == 1){
+                result.push_back({ ZEROM1 });
+                i++;
                 continue;
             }
 
-
-	    // GIVE becomes TAKE if > GIVE <, i.e. 3 instructions -> 1
-            if(sz > 1){
-		auto prev1 = result.at(sz-1);
-		auto prev2 = result.at(sz-2);
-                if(AT(0).action == MOVE &&
-		   prev1.action == GIVE &&
-		   prev2.action == MOVE &&
-		   VAL(0) == prev1.val &&
-		   VAL(0) == -prev2.val){
-		    result.pop_back();
-		    result.pop_back();
-		    result.push_back({ TAKE, (short) -VAL(0) });
-                    continue;
-		}
+            if(pattern({ MOVE, GIVE, MOVE}) &&
+	       VAL(2) == VAL(1) &&
+	       VAL(0) == -VAL(2)){
+		result.push_back({ TAKE, (short) VAL(0) });
+		i+=2;
+		continue;
 	    }
-
+            
             // common pattern of move, transfer, move
-            if(pattern({ FALSEJUMP, MOVE, FALSEJUMP, INCR, MOVE, INCR, MOVE, TRUEJUMP, MOVE, TRUEJUMP}) &&
+            if(pattern({ FALSEJUMP, MOVE, FALSEJUMP,
+			 INCR, MOVE, INCR, MOVE,
+			 TRUEJUMP, MOVE, TRUEJUMP}) &&
 	       VAL(3) == -1 && VAL(5) == 1 && VAL(4) == -VAL(6)){
 		result.push_back({ VALUE, VAL(1) });
 		result.push_back({ VALUE, VAL(4) });
@@ -65,7 +68,6 @@ namespace bf {
 		continue;
             }
 	   
-
 	    // subtract value from current cell and add it to another cell
 	    if(pattern({ FALSEJUMP, INCR, MOVE, INCR, MOVE, TRUEJUMP }) &&
 	       VAL(1) == -1 && VAL(3) == 1 && VAL(2) == -VAL(4)){
@@ -82,7 +84,6 @@ namespace bf {
 		continue;
             }
 
-
             // [+>-<<<---->>>>>]
 	    if(pattern({ FALSEJUMP, INCR, MOVE, INCR, MOVE, INCR, MOVE, TRUEJUMP})){
 		result.push_back({ ADVANCE, 6 });
@@ -93,7 +94,6 @@ namespace bf {
 		i += 7;
 		continue;
 	    }
-
 
             // [+>-<]
 	    if(pattern({ FALSEJUMP, INCR, MOVE, INCR, MOVE, TRUEJUMP})){
@@ -138,29 +138,8 @@ namespace bf {
                 continue;
             }
 
-	    // registers an itsy-bitsy improvement.
-	    if(pattern({ MOVE, INCR})) {
-		result.push_back ({VALUE, VAL(0)});
-		result.push_back ({MOVEINCR, VAL(1) });
-		i++;
-		continue;
-	    }
-	    
-            // +[-]
-            if( pattern({ INCR, FALSEJUMP, INCR, TRUEJUMP })){
-                if(result.size() && result.back().action == ZERO){
-                    result.pop_back();
-                }
-		result.push_back({ ZERO });
-		i+=3;
-		continue;
-            }
-	    
 	    // [-]
 	    if(pattern({ FALSEJUMP, INCR, TRUEJUMP })){
-                if(result.size() && result.back().action == ZERO){
-                    result.pop_back();
-                }
 		result.push_back({ ZERO });
 		i+=2;
 		continue;
@@ -175,6 +154,10 @@ namespace bf {
 
 	    result.push_back(instrs.at(i));
 	}
+
+        if(take_second_pass){
+            result = optimizations(result,false);
+        }
 
 	return result;
     }

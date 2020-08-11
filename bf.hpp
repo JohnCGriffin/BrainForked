@@ -9,7 +9,7 @@
 
 namespace bf {
 
-#define ENUMERATED_ACTIONS { ADVANCE, FALSEJUMP, GIVE, INCR, M1, MOVE, MOVEINCR, \
+#define ENUMERATED_ACTIONS { ADVANCE, FALSEJUMP, GIVE, INCR, M1, MOVE, \
 			     MOVEWHILE, OFFINCR, PRINT, READ, TAKE, TERMINATE, \
 			     MXINCR1, MXDECR1, INCR1MX, DECR1MX, TRUEJUMP, \
                              VALUE, WHILEIM2, WHILEIM3, ZERO, ZEROM1 }
@@ -33,6 +33,7 @@ namespace bf {
 
     Instructions read_instructions(std::istream& is);
 
-    Instructions optimizations(const Instructions& instrs);
+    Instructions optimizations(const Instructions& instrs, 
+        bool take_second_pass=true);
 
 }

@@ -16,8 +16,8 @@
 
 
 #ifdef PROFILER
-    static volatile int current_loop;
-    static std::map<volatile int,unsigned long> counts;
+static volatile int current_loop;
+static std::map<volatile int,unsigned long> counts;
 #endif
 
 namespace bf {
@@ -59,29 +59,28 @@ namespace bf {
 
         // Note that initialization in modern manner chokes clang/g++ 
         // when in c++14/17.  Direct assignment one by one seems to work.
-        addrs[ADVANCE]     = &&_ADVANCE;
-        addrs[VALUE]       = &&_VALUE;
-        addrs[MOVE]        = &&_MOVE;
-        addrs[GIVE]        = &&_GIVE;
-        addrs[TAKE]        = &&_TAKE;
-        addrs[INCR]        = &&_INCR;
-        addrs[INCR1MX]        = &&_INCR1MX;
-        addrs[DECR1MX]        = &&_DECR1MX;
-        addrs[MXINCR1]        = &&_MXINCR1;
-        addrs[MXDECR1]        = &&_MXDECR1;
-        addrs[TRUEJUMP]    = &&_TRUEJUMP;
-        addrs[FALSEJUMP]   = &&_FALSEJUMP;
-        addrs[ZERO]        = &&_ZERO;
-	addrs[ZEROM1]      = &&_ZEROM1;
 	addrs[M1]          = &&_M1;
+	addrs[ZEROM1]      = &&_ZEROM1;
+        addrs[ADVANCE]     = &&_ADVANCE;
+        addrs[DECR1MX]     = &&_DECR1MX;
+        addrs[FALSEJUMP]   = &&_FALSEJUMP;
+        addrs[GIVE]        = &&_GIVE;
+        addrs[INCR1MX]     = &&_INCR1MX;
+        addrs[INCR]        = &&_INCR;
         addrs[MOVEWHILE]   = &&_MOVEWHILE;
-        addrs[MOVEINCR]    = &&_MOVEINCR;
+        addrs[MOVE]        = &&_MOVE;
+        addrs[MXDECR1]     = &&_MXDECR1;
+        addrs[MXINCR1]     = &&_MXINCR1;
         addrs[OFFINCR]     = &&_OFFINCR;
-        addrs[WHILEIM2]    = &&_WHILEIM2;
-        addrs[WHILEIM3]    = &&_WHILEIM3;
         addrs[PRINT]       = &&_PRINT;
         addrs[READ]        = &&_READ;
+        addrs[TAKE]        = &&_TAKE;
         addrs[TERMINATE]   = &&_TERMINATE;
+        addrs[TRUEJUMP]    = &&_TRUEJUMP;
+        addrs[VALUE]       = &&_VALUE;
+        addrs[WHILEIM2]    = &&_WHILEIM2;
+        addrs[WHILEIM3]    = &&_WHILEIM3;
+        addrs[ZERO]        = &&_ZERO;
 
 	for(auto a : ENUMERATED_ACTIONS){
             if(!addrs[a]){
@@ -119,11 +118,11 @@ namespace bf {
         if(!(*ptr)){
             IP += IP->val;
         }
-else {
 #ifdef PROFILER
+	else {
 	    current_loop = IP->ndx;
+	}
 #endif
-}
         LOOP();
 
     _DECR1MX:
@@ -194,11 +193,6 @@ else {
         }
 	LOOP();
         
-    _MOVEINCR:
-        ptr += IP[-1].val;
-        ptr[0] += IP->val;
-        LOOP();
-
     _OFFINCR:
 	ptr[IP[-1].val] += IP->val;
         LOOP();
@@ -305,16 +299,16 @@ int main(int argc, char** argv)
 #ifdef PROFILER
 
     std::thread profiler([&]{
-                            while(!current_loop) ;
-                            while(current_loop){
-				auto count = counts[current_loop];
-				if(count > 100000){
-				    break;
-				}
-				counts[current_loop]++;
-                                std::this_thread::yield();
-                                std::cout << std::flush;
-			    }
+			     while(!current_loop) ;
+			     while(current_loop){
+				 auto count = counts[current_loop];
+				 if(count > 100000){
+				     break;
+				 }
+				 counts[current_loop]++;
+				 std::this_thread::yield();
+				 std::cout << std::flush;
+			     }
 			 });
 
     bf::execute(instrs);
@@ -324,7 +318,7 @@ int main(int argc, char** argv)
 
     for(auto entry : counts){
 	std::cout << entry.second << " " << entry.first 
-            << " " << instrs.at(entry.first).val + entry.first << "\n";
+		  << " " << instrs.at(entry.first).val + entry.first << "\n";
     }
 #else
 
