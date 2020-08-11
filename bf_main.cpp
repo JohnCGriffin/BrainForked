@@ -72,6 +72,7 @@ namespace bf {
         addrs[TRUEJUMP]    = &&_TRUEJUMP;
         addrs[FALSEJUMP]   = &&_FALSEJUMP;
         addrs[ZERO]        = &&_ZERO;
+	addrs[ZEROM1]      = &&_ZEROM1;
 	addrs[M1]          = &&_M1;
         addrs[MOVEWHILE]   = &&_MOVEWHILE;
         addrs[MOVEINCR]    = &&_MOVEINCR;
@@ -233,6 +234,10 @@ else {
             ptr += IP->val;
         }
         LOOP();
+
+    _ZEROM1:
+	*ptr++ = 0;
+	LOOP();
 
     _ZERO:
         ptr[0] = 0;

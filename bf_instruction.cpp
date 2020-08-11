@@ -31,6 +31,7 @@ namespace bf {
 	    ACTIONOUT(WHILEIM2);
 	    ACTIONOUT(WHILEIM3);
 	    ACTIONOUT(ZERO);
+	    ACTIONOUT(ZEROM1);
 	default:
 	    throw std::logic_error(__FILE__ " unhandled Action case in operator<<");
 	}

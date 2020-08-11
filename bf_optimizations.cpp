@@ -28,9 +28,19 @@ namespace bf {
 #define VAL(x) instrs.at(i+x).val
 
 	    auto pattern  = [&](Actions actions){ return matches(instrs, i, actions); };
+	    
+	    const int sz = result.size();
+
+
+            if(AT(0).action == MOVE && VAL(0) == 1 && sz > 0 && result.back().action == ZERO){
+                result.pop_back();
+                result.push_back({ ZEROM1});
+                continue;
+            }
+
 
 	    // GIVE becomes TAKE if > GIVE <, i.e. 3 instructions -> 1
-            if(int sz = result.size();sz > 1){
+            if(sz > 1){
 		auto prev1 = result.at(sz-1);
 		auto prev2 = result.at(sz-2);
                 if(AT(0).action == MOVE &&
