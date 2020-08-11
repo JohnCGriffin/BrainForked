@@ -30,19 +30,21 @@ namespace bf {
 
 	    auto pattern  = [&](Actions actions){ return matches(instrs, i, actions); };
 
+            // pass 2
             if(pattern({ZERO, MOVE}) && VAL(1) == 1){
                 result.push_back({ ZEROM1 });
                 i++;
                 continue;
             }
 
+            // pass 2
 	    if(pattern({MOVE, ZERO}) && VAL(0) == 1){
 		result.push_back({ M1ZERO });
 		i++;
 		continue;
 	    }
 
-	    // pass2
+	    // pass 2
 	    if(pattern({FALSEJUMP, MOVE, ZERO, MXDECR1, TRUEJUMP }) &&
 	       VAL(1) == 1 && VAL(3) == -1){
 		result.push_back({ZERO2IF});
@@ -50,7 +52,7 @@ namespace bf {
 		continue;
 	    }
 
-	    // PASS2
+	    // PASS 2
             if(pattern({ MOVE, GIVE, MOVE}) &&
 	       VAL(2) == VAL(1) &&
 	       VAL(0) == -VAL(2)){
@@ -58,6 +60,9 @@ namespace bf {
 		i+=2;
 		continue;
  	    }
+
+
+            // EVERYTHING past this points must be constructed of normal BF primitives
 
             // common pattern of move, transfer, move
             if(pattern({ FALSEJUMP, MOVE, FALSEJUMP,
@@ -79,6 +84,7 @@ namespace bf {
 		continue;
 	    }
 
+            // alternate version decrements last
 	    // subtract value from current cell and add it to another cell
 	    if(pattern({ FALSEJUMP, MOVE, INCR, MOVE, INCR, TRUEJUMP }) &&
 	       VAL(2) == 1 && VAL(4) == -1 && VAL(1) == -VAL(3)){
