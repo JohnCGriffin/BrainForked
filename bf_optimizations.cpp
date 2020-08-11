@@ -30,32 +30,35 @@ namespace bf {
 
 	    auto pattern  = [&](Actions actions){ return matches(instrs, i, actions); };
 
-            if(pattern({ZERO, INCR, ZERO})){
-                result.push_back({ZERO});
-                i+=2;
-                continue;
-            }
-	    
-            if(pattern({ZERO, ZERO})){
-                result.push_back({ZERO});
-                i++;
-                continue;
-            }
-	    
             if(pattern({ZERO, MOVE}) && VAL(1) == 1){
                 result.push_back({ ZEROM1 });
                 i++;
                 continue;
             }
 
+	    if(pattern({MOVE, ZERO}) && VAL(0) == 1){
+		result.push_back({ M1ZERO });
+		i++;
+		continue;
+	    }
+
+	    // pass2
+	    if(pattern({FALSEJUMP, MOVE, ZERO, MXDECR1, TRUEJUMP }) &&
+	       VAL(1) == 1 && VAL(3) == -1){
+		result.push_back({ZERO2IF});
+		i+=4;
+		continue;
+	    }
+
+	    // PASS2
             if(pattern({ MOVE, GIVE, MOVE}) &&
 	       VAL(2) == VAL(1) &&
 	       VAL(0) == -VAL(2)){
 		result.push_back({ TAKE, (short) VAL(0) });
 		i+=2;
 		continue;
-	    }
-            
+ 	    }
+
             // common pattern of move, transfer, move
             if(pattern({ FALSEJUMP, MOVE, FALSEJUMP,
 			 INCR, MOVE, INCR, MOVE,
@@ -140,6 +143,9 @@ namespace bf {
 
 	    // [-]
 	    if(pattern({ FALSEJUMP, INCR, TRUEJUMP })){
+		while(result.back().action == ZERO || result.back().action == INCR){
+		    result.pop_back();
+		}
 		result.push_back({ ZERO });
 		i+=2;
 		continue;

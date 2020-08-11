@@ -18,6 +18,7 @@ namespace bf {
 	    ACTIONOUT(INCR1MX);
 	    ACTIONOUT(DECR1MX);
 	    ACTIONOUT(M1);
+	    ACTIONOUT(M1ZERO);
 	    ACTIONOUT(MOVE);
 	    ACTIONOUT(MOVEWHILE);
 	    ACTIONOUT(OFFINCR);
@@ -30,6 +31,7 @@ namespace bf {
 	    ACTIONOUT(WHILEIM2);
 	    ACTIONOUT(WHILEIM3);
 	    ACTIONOUT(ZERO);
+	    ACTIONOUT(ZERO2IF);
 	    ACTIONOUT(ZEROM1);
 	default:
 	    throw std::logic_error(__FILE__ " unhandled Action case in operator<<");

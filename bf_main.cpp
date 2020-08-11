@@ -67,6 +67,7 @@ namespace bf {
         addrs[GIVE]        = &&_GIVE;
         addrs[INCR1MX]     = &&_INCR1MX;
         addrs[INCR]        = &&_INCR;
+	addrs[M1ZERO]      = &&_M1ZERO;
         addrs[MOVEWHILE]   = &&_MOVEWHILE;
         addrs[MOVE]        = &&_MOVE;
         addrs[MXDECR1]     = &&_MXDECR1;
@@ -81,6 +82,7 @@ namespace bf {
         addrs[WHILEIM2]    = &&_WHILEIM2;
         addrs[WHILEIM3]    = &&_WHILEIM3;
         addrs[ZERO]        = &&_ZERO;
+	addrs[ZERO2IF]     = &&_ZERO2IF;
 
 	for(auto a : ENUMERATED_ACTIONS){
             if(!addrs[a]){
@@ -229,8 +231,18 @@ namespace bf {
         }
         LOOP();
 
+    _ZERO2IF:
+	if(ptr[0]){
+	    ptr[0] = ptr[1] = 0;
+	}
+	LOOP();
+
     _ZEROM1:
 	*ptr++ = 0;
+	LOOP();
+
+    _M1ZERO:
+	*(++ptr) = 0;
 	LOOP();
 
     _ZERO:
