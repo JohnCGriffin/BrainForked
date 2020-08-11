@@ -69,6 +69,7 @@ namespace bf {
         addrs[INCR]        = &&_INCR;
 	addrs[M1ZERO]      = &&_M1ZERO;
         addrs[MOVEWHILE]   = &&_MOVEWHILE;
+        addrs[WHILEMGM]    = &&_WHILEMGM;
         addrs[MOVE]        = &&_MOVE;
         addrs[MXDECR1]     = &&_MXDECR1;
         addrs[MXINCR1]     = &&_MXINCR1;
@@ -146,6 +147,27 @@ namespace bf {
         ptr += IP->val;
         ptr[0]--;
         LOOP();
+	/*
+ 568           MOVE 1
+   569           GIVE 9
+   570           MOVE -10
+   571         TRUEJUMP -4
+	*/
+  
+    _WHILEMGM:
+        if(ptr[0]){
+	    const int m1 = IP[-2].val;
+	    const int g = IP[-1].val;
+	    const int m2 = IP->val;
+	    do {
+		ptr += m1;
+		ptr[g] += ptr[0];
+		ptr[0] = 0;
+		ptr += m2;
+	    } while(ptr[0]);
+        }
+        LOOP();
+
 
     _WHILEIM3:
         if(ptr[0]){
@@ -314,7 +336,7 @@ int main(int argc, char** argv)
 			     while(!current_loop) ;
 			     while(current_loop){
 				 auto count = counts[current_loop];
-				 if(count > 100000){
+				 if(count > 500000){
 				     break;
 				 }
 				 counts[current_loop]++;

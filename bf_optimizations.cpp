@@ -61,21 +61,15 @@ namespace bf {
 		continue;
  	    }
 
-
-            // EVERYTHING past this points must be constructed of normal BF primitives
-
-            // common pattern of move, transfer, move
-            if(pattern({ FALSEJUMP, MOVE, FALSEJUMP,
-			 INCR, MOVE, INCR, MOVE,
-			 TRUEJUMP, MOVE, TRUEJUMP}) &&
-	       VAL(3) == -1 && VAL(5) == 1 && VAL(4) == -VAL(6)){
-		result.push_back({ VALUE, VAL(1) });
-		result.push_back({ VALUE, VAL(4) });
-		result.push_back({ M1, VAL(8) });
-		i += 9;
+	    // PASS 2
+	    if(pattern({FALSEJUMP, MOVE, GIVE, MOVE, TRUEJUMP})){
+		result.push_back({VALUE, (short) VAL(1) });
+		result.push_back({VALUE, (short) VAL(2) });
+		result.push_back({WHILEMGM, (short) VAL(3) });
+		i += 4;
 		continue;
-            }
-	   
+	    }
+
 	    // subtract value from current cell and add it to another cell
 	    if(pattern({ FALSEJUMP, INCR, MOVE, INCR, MOVE, TRUEJUMP }) &&
 	       VAL(1) == -1 && VAL(3) == 1 && VAL(2) == -VAL(4)){
