@@ -60,7 +60,6 @@ namespace bf {
 
         // Note that initialization in modern manner chokes clang/g++ 
         // when in c++14/17.  Direct assignment one by one seems to work.
-	addrs[M1]          = &&_M1;
 	addrs[ZEROM1]      = &&_ZEROM1;
         addrs[ADVANCE]     = &&_ADVANCE;
         addrs[DECR1MX]     = &&_DECR1MX;
@@ -197,20 +196,6 @@ namespace bf {
         }
         LOOP();
 
-    _M1:
-        if(ptr[0]){
-	    const auto a = IP[-2].val;
-	    const auto b = IP[-1].val;
-	    const auto c = IP->val;
-	    do {
-		ptr += a;
-		ptr[b] += ptr[0];
-		ptr[0] = 0;
-		ptr += c;
-	    } while(ptr[0]);
-        }
-	LOOP();
-        
     _OFFINCR:
 	ptr[IP[-1].val] += IP->val;
         LOOP();
