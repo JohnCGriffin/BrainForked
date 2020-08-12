@@ -72,6 +72,15 @@ namespace bf {
 		    i += 4;
 		    continue;
 		}
+
+                if(pattern({DECR1MX, GIVE, MOVE}) &&
+		   VAL(0) == -VAL(1) && VAL(0) == -VAL(2)){
+		    result.push_back({INCR, -1});
+		    result.push_back({TAKE, VAL(0)});
+		    i += 2;
+		    continue;
+		}
+            
 	    }
 
 
