@@ -22,16 +22,8 @@ static std::map<volatile int,unsigned long> counts;
 
 namespace bf {
 
-    static Instructions load_instructions(std::istream& is)
+    static void patch_while_loops(Instructions& instructions)
     {
-        auto instructions = read_instructions(is);
-
-        instructions = optimizations(instructions);
-
-        // WHILE LOOP PATCHING MUST BE LAST
-        // so that the mutual begin/end while
-        // loop offsets are correct.
-    
         std::vector<int> while_stack;
         for(size_t i=0; i<instructions.size(); i++){
         
@@ -46,6 +38,15 @@ namespace bf {
                 while_stack.pop_back();
             }
         }
+    }
+
+    static Instructions load_instructions(std::istream& is)
+    {
+        auto instructions = read_instructions(is);
+
+        instructions = optimizations(instructions);
+
+        patch_while_loops(instructions);
 
         instructions.push_back({ TERMINATE });
 
@@ -147,12 +148,6 @@ namespace bf {
         ptr += IP->val;
         ptr[0]--;
         LOOP();
-	/*
- 568           MOVE 1
-   569           GIVE 9
-   570           MOVE -10
-   571         TRUEJUMP -4
-	*/
   
     _WHILEMGM:
         if(ptr[0]){
@@ -167,7 +162,6 @@ namespace bf {
 	    } while(ptr[0]);
         }
         LOOP();
-
 
     _WHILEIM3:
         if(ptr[0]){
