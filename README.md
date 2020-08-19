@@ -4,6 +4,9 @@ This is almost standard C++, except for the use of clang++/g++ computed labels e
 time of writing (Aug 2020), it is the fastest non-JIT interpreter for the commonly referenced mandelbrot and hanoi
 BF programs.
 
+For a clear explanation of the computed labels, see the slower but more lucid code in
+https://github.com/JohnCGriffin/BF-computed-goto.
+
 ## Building
 
 Step 1 - The Makefile is set to use **clang++**.  Change to **g++** if you prefer.
