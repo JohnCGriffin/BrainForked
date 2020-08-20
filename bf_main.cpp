@@ -70,6 +70,7 @@ namespace bf {
 	addrs[M1ZERO]      = &&_M1ZERO;
         addrs[MOVEWHILE]   = &&_MOVEWHILE;
         addrs[WHILEMGM]    = &&_WHILEMGM;
+	addrs[WHILEDECROI2]= &&_WHILEDECROI2;
         addrs[MOVE]        = &&_MOVE;
         addrs[MXDECR1]     = &&_MXDECR1;
         addrs[MXINCR1]     = &&_MXINCR1;
@@ -147,6 +148,18 @@ namespace bf {
         ptr += IP->val;
         ptr[0]--;
         LOOP();
+
+    _WHILEDECROI2:
+	if(ptr[0]){
+	    const int o1 = IP[-2].val;
+	    const int o2 = IP[-1].val;
+	    do {
+		ptr[0]--;
+		ptr[o1]++;
+		ptr[o2]++;
+	    } while(ptr[0]);
+	}
+	LOOP();
   
     _WHILEMGM:
         if(ptr[0]){

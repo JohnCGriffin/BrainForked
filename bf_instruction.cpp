@@ -10,6 +10,7 @@ namespace bf {
 #define ACTIONOUT(A) case A: return os << #A
 	switch(action){
 	    ACTIONOUT(ADVANCE);
+	    ACTIONOUT(WHILEDECROI2);
 	    ACTIONOUT(FALSEJUMP);
 	    ACTIONOUT(GIVE);
 	    ACTIONOUT(INCR);

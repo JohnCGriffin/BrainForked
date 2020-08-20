@@ -80,7 +80,15 @@ namespace bf {
 		    i += 2;
 		    continue;
 		}
-            
+
+		if(pattern({ADVANCE, VALUE, VALUE, VALUE, VALUE, VALUE, VALUE, WHILEIM3}) &&
+		   VAL(1) == -1 && VAL(3) ==1 && VAL(5) == 1 && (VAL(2) + VAL(4) + VAL(6) == 0)){
+		    result.push_back({VALUE, VAL(2)});
+		    result.push_back({VALUE, (short) (VAL(4)+VAL(2))});
+		    result.push_back({WHILEDECROI2});
+		    i += 7;
+		    continue;
+		}
 	    }
 
 
