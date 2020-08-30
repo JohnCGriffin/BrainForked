@@ -9,19 +9,42 @@
 
 namespace bf {
 
-#define ENUMERATED_ACTIONS { ADVANCE, FALSEJUMP, GIVE, INCR, MOVE, WHILEDECROI2, \
-			     MOVEWHILE, OFFINCR, PRINT, READ, TAKE, TERMINATE, \
-			     M1ZERO, MXINCR1, MXDECR1, INCR1MX, DECR1MX, TRUEJUMP, \
-                             WHILEMGM, VALUE, WHILEIM2, WHILEIM3, ZERO, ZERO2IF, ZEROM1 }
+#define ENUMERATED_ACTIONS { ADVANCE,		\
+			     DECR1MX,		\
+			     FALSEJUMP,		\
+			     GIVE,		\
+			     INCR,		\
+			     INCR1MX,		\
+			     M1ZERO,		\
+			     MOVE,		\
+			     MOVEWHILE,		\
+			     MXDECR1,		\
+			     MXINCR1,		\
+			     OFFINCR,		\
+			     PRINT,		\
+			     READ,		\
+			     TAKE,		\
+			     TERMINATE,		\
+			     TRUEJUMP,		\
+			     VALUE,		\
+			     WHILEDECROI2,	\
+			     WHILEIM2,		\
+			     WHILEIM3,		\
+			     WHILEMGM,		\
+			     ZERO,		\
+			     ZERO2IF,		\
+			     ZEROM1,		}
+
+
 
     enum Action ENUMERATED_ACTIONS;
 
     struct Instruction {
 	Action action;
-        short val;
-	void* jump;
+ 	short  val=0;
+	void*  jump=0;
 #ifdef PROFILER
-        int ndx;
+	int ndx=0;
 #endif
     };
 
@@ -34,6 +57,6 @@ namespace bf {
     Instructions read_instructions(std::istream& is);
 
     Instructions optimizations(const Instructions& instrs, 
-        bool take_second_pass=true);
+			       bool take_second_pass=true);
 
 }

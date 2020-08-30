@@ -24,130 +24,130 @@ namespace bf {
 
     static void patch_while_loops(Instructions& instructions)
     {
-        std::vector<int> while_stack;
-        for(size_t i=0; i<instructions.size(); i++){
-        
-            if(instructions.at(i).action == FALSEJUMP){
-                while_stack.push_back(i);
-            }
-        
-            if(instructions.at(i).action == TRUEJUMP){
-                int start = while_stack.back();
-                instructions.at(start).val = (i - start);
-                instructions.at(i).val = (start - i);
-                while_stack.pop_back();
-            }
-        }
+	std::vector<int> while_stack;
+	for(size_t i=0; i<instructions.size(); i++){
+
+	    if(instructions.at(i).action == FALSEJUMP){
+		while_stack.push_back(i);
+	    }
+
+	    if(instructions.at(i).action == TRUEJUMP){
+		int start = while_stack.back();
+		instructions.at(start).val = (i - start);
+		instructions.at(i).val = (start - i);
+		while_stack.pop_back();
+	    }
+	}
     }
 
     static Instructions load_instructions(std::istream& is)
     {
-        auto instructions = read_instructions(is);
+	auto instructions = read_instructions(is);
 
-        instructions = optimizations(instructions);
+	instructions = optimizations(instructions);
 
-        patch_while_loops(instructions);
+	patch_while_loops(instructions);
 
-        instructions.push_back({ TERMINATE });
+	instructions.push_back({ TERMINATE });
 
-        return instructions;
+	return instructions;
     }
 
-    
+
     static void execute(Instructions&  _instructions)
     {
-        std::map<Action,void*> addrs;
+	std::map<Action,void*> addrs;
 
-        // Note that initialization in modern manner chokes clang/g++ 
-        // when in c++14/17.  Direct assignment one by one seems to work.
-	addrs[ZEROM1]      = &&_ZEROM1;
-        addrs[ADVANCE]     = &&_ADVANCE;
-        addrs[DECR1MX]     = &&_DECR1MX;
-        addrs[FALSEJUMP]   = &&_FALSEJUMP;
-        addrs[GIVE]        = &&_GIVE;
-        addrs[INCR1MX]     = &&_INCR1MX;
-        addrs[INCR]        = &&_INCR;
-	addrs[M1ZERO]      = &&_M1ZERO;
-        addrs[MOVEWHILE]   = &&_MOVEWHILE;
-        addrs[WHILEMGM]    = &&_WHILEMGM;
-	addrs[WHILEDECROI2]= &&_WHILEDECROI2;
-        addrs[MOVE]        = &&_MOVE;
-        addrs[MXDECR1]     = &&_MXDECR1;
-        addrs[MXINCR1]     = &&_MXINCR1;
-        addrs[OFFINCR]     = &&_OFFINCR;
-        addrs[PRINT]       = &&_PRINT;
-        addrs[READ]        = &&_READ;
-        addrs[TAKE]        = &&_TAKE;
-        addrs[TERMINATE]   = &&_TERMINATE;
-        addrs[TRUEJUMP]    = &&_TRUEJUMP;
-        addrs[VALUE]       = &&_VALUE;
-        addrs[WHILEIM2]    = &&_WHILEIM2;
-        addrs[WHILEIM3]    = &&_WHILEIM3;
-        addrs[ZERO]        = &&_ZERO;
-	addrs[ZERO2IF]     = &&_ZERO2IF;
+	// Note that initialization in modern manner chokes clang/g++
+	// when in c++14/17.  Direct assignment one by one seems to work.
+	addrs[ADVANCE]	    = &&_ADVANCE;
+	addrs[DECR1MX]	    = &&_DECR1MX;
+	addrs[FALSEJUMP]    = &&_FALSEJUMP;
+	addrs[GIVE]	    = &&_GIVE;
+	addrs[INCR1MX]	    = &&_INCR1MX;
+	addrs[INCR]	    = &&_INCR;
+	addrs[M1ZERO]	    = &&_M1ZERO;
+	addrs[MOVEWHILE]    = &&_MOVEWHILE;
+	addrs[MOVE]	    = &&_MOVE;
+	addrs[MXDECR1]	    = &&_MXDECR1;
+	addrs[MXINCR1]	    = &&_MXINCR1;
+	addrs[OFFINCR]	    = &&_OFFINCR;
+	addrs[PRINT]	    = &&_PRINT;
+	addrs[READ]	    = &&_READ;
+	addrs[TAKE]	    = &&_TAKE;
+	addrs[TERMINATE]    = &&_TERMINATE;
+	addrs[TRUEJUMP]	    = &&_TRUEJUMP;
+	addrs[VALUE]	    = &&_VALUE;
+	addrs[WHILEDECROI2] = &&_WHILEDECROI2;
+	addrs[WHILEIM2]	    = &&_WHILEIM2;
+	addrs[WHILEIM3]	    = &&_WHILEIM3;
+	addrs[WHILEMGM]	    = &&_WHILEMGM;
+	addrs[ZERO2IF]	    = &&_ZERO2IF;
+	addrs[ZEROM1]	    = &&_ZEROM1;
+	addrs[ZERO]	    = &&_ZERO;
 
 	for(auto a : ENUMERATED_ACTIONS){
-            if(!addrs[a]){
+	    if(!addrs[a]){
 		throw std::logic_error(to_string(a) + " not in address table");
-            }
-        }
+	    }
+	}
 
-        for(auto& instr : _instructions){
-            instr.jump = addrs.at(instr.action);
-        }
+	for(auto& instr : _instructions){
+	    instr.jump = addrs.at(instr.action);
+	}
 
 #ifdef PROFILER
-        for(int i=0; i<_instructions.size(); i++){
-            _instructions.at(i).ndx = i;
-        }
+	for(int i=0; i<_instructions.size(); i++){
+	    _instructions.at(i).ndx = i;
+	}
 #endif
 
-        std::vector<char> characters(30000);
-        char* ptr = characters.data();
-        auto BEGIN = _instructions.data();
-        auto IP = BEGIN;
+	std::vector<char> characters(30000);
+	char* ptr = characters.data();
+	auto BEGIN = _instructions.data();
+	auto IP = BEGIN;
 
-        // initial JUMP.  The remainder happen via the LOOP macro.
-        goto *(IP->jump);
+	// initial JUMP.  The remainder happen via the LOOP macro.
+	goto *(IP->jump);
 
 #define LOOP() IP++; goto *(IP->jump)
 
     _TRUEJUMP:
-        if(*ptr){
-            IP += IP->val;
-        }
-        LOOP();
-        
-    _FALSEJUMP:     
-        if(!(*ptr)){
-            IP += IP->val;
-        }
+	if(*ptr){
+	    IP += IP->val;
+	}
+	LOOP();
+
+    _FALSEJUMP:
+	if(!(*ptr)){
+	    IP += IP->val;
+	}
 #ifdef PROFILER
 	else {
 	    current_loop = IP->ndx;
 	}
 #endif
-        LOOP();
+	LOOP();
 
     _DECR1MX:
-        ptr[0]--;
-        ptr += IP->val;
-        LOOP();
+	ptr[0]--;
+	ptr += IP->val;
+	LOOP();
 
     _INCR1MX:
-        ptr[0]++;
-        ptr += IP->val;
-        LOOP();
+	ptr[0]++;
+	ptr += IP->val;
+	LOOP();
 
     _MXINCR1:
-        ptr += IP->val;
-        ptr[0]++;
-        LOOP();
+	ptr += IP->val;
+	ptr[0]++;
+	LOOP();
 
     _MXDECR1:
-        ptr += IP->val;
-        ptr[0]--;
-        LOOP();
+	ptr += IP->val;
+	ptr[0]--;
+	LOOP();
 
     _WHILEDECROI2:
 	if(ptr[0]){
@@ -160,9 +160,9 @@ namespace bf {
 	    } while(ptr[0]);
 	}
 	LOOP();
-  
+
     _WHILEMGM:
-        if(ptr[0]){
+	if(ptr[0]){
 	    const int m1 = IP[-2].val;
 	    const int g = IP[-1].val;
 	    const int m2 = IP->val;
@@ -172,18 +172,18 @@ namespace bf {
 		ptr[0] = 0;
 		ptr += m2;
 	    } while(ptr[0]);
-        }
-        LOOP();
+	}
+	LOOP();
 
     _WHILEIM3:
-        if(ptr[0]){
-            const auto a = IP[-6].val;
-            const auto b = IP[-5].val;
-            const auto c = IP[-4].val;
-            const auto d = IP[-3].val;
-            const auto e = IP[-2].val;
-            const auto f = IP[-1].val;
-            do {
+	if(ptr[0]){
+	    const auto a = IP[-6].val;
+	    const auto b = IP[-5].val;
+	    const auto c = IP[-4].val;
+	    const auto d = IP[-3].val;
+	    const auto e = IP[-2].val;
+	    const auto f = IP[-1].val;
+	    do {
 		ptr[0] += a;
 		ptr += b;
 		ptr[0] += c;
@@ -191,59 +191,59 @@ namespace bf {
 		ptr[0] += e;
 		ptr += f;
 	    } while(ptr[0]);
-        }
-        LOOP();
+	}
+	LOOP();
 
     _WHILEIM2:
-        if(ptr[0]){
-            const auto a = IP[-4].val;
-            const auto b = IP[-3].val;
-            const auto c = IP[-2].val;
-            const auto d = IP[-1].val;
-            do {
+	if(ptr[0]){
+	    const auto a = IP[-4].val;
+	    const auto b = IP[-3].val;
+	    const auto c = IP[-2].val;
+	    const auto d = IP[-1].val;
+	    do {
 		ptr[0] += a;
 		ptr += b;
 		ptr[0] += c;
 		ptr += d;
 	    } while(ptr[0]);
-        }
-        LOOP();
+	}
+	LOOP();
 
     _OFFINCR:
 	ptr[IP[-1].val] += IP->val;
-        LOOP();
+	LOOP();
 
 
     _ADVANCE:
-        IP += IP->val;
-        LOOP();
+	IP += IP->val;
+	LOOP();
 
     _VALUE:
-        LOOP();
+	LOOP();
 
     _GIVE:
-        ptr[IP->val] += (ptr[0] + 256);
-        ptr[0] = 0;
+	ptr[IP->val] += (ptr[0] + 256);
+	ptr[0] = 0;
 	LOOP();
 
     _TAKE:
-        ptr[0] += (ptr[IP->val] + 256);
-        ptr[IP->val] = 0;
+	ptr[0] += (ptr[IP->val] + 256);
+	ptr[IP->val] = 0;
 	LOOP();
 
     _MOVE:
-        ptr += IP->val;
-        LOOP();
-        
+	ptr += IP->val;
+	LOOP();
+
     _INCR:
-        *ptr += IP->val;
-        LOOP();
-        
+	*ptr += IP->val;
+	LOOP();
+
     _MOVEWHILE:
-        while(ptr[0]){
-            ptr += IP->val;
-        }
-        LOOP();
+	while(ptr[0]){
+	    ptr += IP->val;
+	}
+	LOOP();
 
     _ZERO2IF:
 	if(ptr[0]){
@@ -260,22 +260,22 @@ namespace bf {
 	LOOP();
 
     _ZERO:
-        ptr[0] = 0;
-        LOOP();
+	ptr[0] = 0;
+	LOOP();
 
 
     _PRINT:
 #ifndef PROFILER
-        std::cout << (*ptr);
+	std::cout << (*ptr);
 #endif
-        LOOP();
+	LOOP();
 
     _READ:
-        std::cin.get(*ptr);
-        LOOP();
+	std::cin.get(*ptr);
+	LOOP();
 
     _TERMINATE:
-        return;
+	return;
 
     }
 
@@ -285,40 +285,40 @@ int main(int argc, char** argv)
 {
     bool dump = argc > 1 && !strcmp("-dump",argv[1]);
     if(dump){
-        argc--;
-        argv++;
+	argc--;
+	argv++;
     }
     std::ifstream ifs;
 
     if(argc == 2){
-        ifs.open(argv[1]);
-        if(!ifs){
-            std::cerr << "could not open " << argv[1] << std::endl;
-            return 1;
-        }
+	ifs.open(argv[1]);
+	if(!ifs){
+	    std::cerr << "could not open " << argv[1] << std::endl;
+	    return 1;
+	}
     }
-    
+
     std::istream& is(argc == 2 ? ifs : std::cin);
-    
+
     auto instrs = bf::load_instructions(is);
 
     if(dump){
-        auto while_level = 0;
-        for(int i=0; i<instrs.size(); i++){
+	auto while_level = 0;
+	for(unsigned i=0; i<instrs.size(); i++){
 	    auto instr = instrs[i];
-            if(instr.action == bf::TRUEJUMP){
+	    if(instr.action == bf::TRUEJUMP){
 		while_level--;
 	    }
-            std::cout.width(6);
-            std::cout << i << " ";
+	    std::cout.width(6);
+	    std::cout << i << " ";
 	    for(int j=0; j<while_level; j++){
-		std::cout << "  ";
+		std::cout << "	";
 	    }
 	    std::cout << instr.action << " " << instr.val << "\n";
 	    if(instr.action == bf::FALSEJUMP){
 		while_level++;
 	    }
-        }
+	}
 	return 0;
     }
 
@@ -343,7 +343,7 @@ int main(int argc, char** argv)
     profiler.join();
 
     for(auto entry : counts){
-	std::cout << entry.second << " " << entry.first 
+	std::cout << entry.second << " " << entry.first
 		  << " " << instrs.at(entry.first).val + entry.first << "\n";
     }
 #else

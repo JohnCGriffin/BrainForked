@@ -73,7 +73,7 @@ namespace bf {
 		    continue;
 		}
 
-                if(pattern({DECR1MX, GIVE, MOVE}) &&
+		if(pattern({DECR1MX, GIVE, MOVE}) &&
 		   VAL(0) == -VAL(1) && VAL(0) == -VAL(2)){
 		    result.push_back({INCR, -1});
 		    result.push_back({TAKE, VAL(0)});
@@ -92,9 +92,9 @@ namespace bf {
 	    }
 
 
-            ///////////////////////////////////////////////////
-            //  All that follow are primitives for first pass.
-            //////////////////////////////////////////////////
+	    ///////////////////////////////////////////////////
+	    //	All that follow are primitives for first pass.
+	    //////////////////////////////////////////////////
 	    {
 		// subtract value from current cell and add it to another cell
 		if(pattern({ FALSEJUMP, INCR, MOVE, INCR, MOVE, TRUEJUMP }) &&
@@ -188,9 +188,9 @@ namespace bf {
 	    result.push_back(instrs.at(i));
 	}
 
-        if(take_second_pass){
-            result = optimizations(result,false);
-        }
+	if(take_second_pass){
+	    result = optimizations(result,false);
+	}
 
 	return result;
     }

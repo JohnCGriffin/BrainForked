@@ -5,7 +5,7 @@
 #include <map>
 
 namespace bf {
-    
+
     Instructions read_instructions(std::istream& is)
     {
 	static std::map<char,int> direction = {{'>', 1}, {'<', -1}, {'+', 1}, {'-', -1}};
@@ -20,7 +20,7 @@ namespace bf {
 			   { ',', READ }};
 
 	Instructions instructions;
-        char c;
+	char c;
 
 	while(is >> c){
 	    switch(c){
@@ -45,7 +45,7 @@ namespace bf {
 		break;
 	    }
 	}
-	
+
 	return instructions;
     }
 
